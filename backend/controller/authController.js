@@ -7,6 +7,7 @@ import { genToken,genToken1 } from "../config/token.js";
 export const registration = async (req, res) => {
     try {
         const { name, email, password } = req.body;
+        console.log('Registration request:', { name, email, password: password ? '***' : '' }); // Log without password
         const existUser = await User.findOne({ email });
         if (existUser) {
             return res.status(400).json({ message: "User already exists" });
@@ -25,11 +26,11 @@ export const registration = async (req, res) => {
         })
         let token = await genToken(user._id);
         res.cookie("token", token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-            maxAge: 7 * 24 * 60 * 60 * 1000
-        })
+    httpOnly: true,
+    secure: false,        // MUST be false in localhost
+    sameSite: "lax",      // stable for dev
+    maxAge: 7 * 24 * 60 * 60 * 1000
+});
         const safeUser = user.toObject();
         delete safeUser.password;
         return res.status(201).json({ user: safeUser });
@@ -54,11 +55,11 @@ export const login = async (req, res) => {
         }
         let token = await genToken(user._id);
         res.cookie("token", token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-            maxAge: 7 * 24 * 60 * 60 * 1000
-        })
+    httpOnly: true,
+    secure: false,        // MUST be false in localhost
+    sameSite: "lax",      // stable for dev
+    maxAge: 7 * 24 * 60 * 60 * 1000
+});
         const safeUser = user.toObject();
         delete safeUser.password;
         return res.status(200).json({ user: safeUser });
@@ -98,11 +99,11 @@ export const googleLogin = async (req, res) => {
 
         let token = await genToken(existUser._id);
         res.cookie("token", token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-            maxAge: 7 * 24 * 60 * 60 * 1000
-        });
+    httpOnly: true,
+    secure: false,        // MUST be false in localhost
+    sameSite: "lax",      // stable for dev
+    maxAge: 7 * 24 * 60 * 60 * 1000
+});
         const safeUser = existUser.toObject();
         delete safeUser.password;
         return res.status(200).json({ user: safeUser });
@@ -117,12 +118,12 @@ export const adminLogin = async (req, res) => {
         let { email, password } = req.body;
         if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
             let token = await genToken1(email);
-            res.cookie("token", token, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-                maxAge: 7 * 24 * 60 * 60 * 1000
-            });
+res.cookie("token", token, {
+    httpOnly: true,
+    secure: false,        // MUST be false in localhost
+    sameSite: "lax",      // stable for dev
+    maxAge: 7 * 24 * 60 * 60 * 1000
+});
             return res.status(200).json({ message: "Admin logged in successfully" });
         }
         return res.status(401).json({ message: "Invalid admin credentials" });

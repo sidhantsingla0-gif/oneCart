@@ -5,7 +5,7 @@ import { IoEye } from "react-icons/io5";
 import { useNavigate } from 'react-router-dom'
 import { authDataContext } from '../context/authContext.jsx';
 import { userDataContext } from '../context/UserContext.jsx';
-import axios from 'axios'
+import axios from "../config/axios"
 import { signInWithPopup } from 'firebase/auth';
 import { auth, provider } from '../../utils/Firebase.js';
 import { toast } from 'react-toastify';
@@ -26,9 +26,9 @@ function Login() {
     e.preventDefault()
     setIsLoading(true)
     try {
-      let result = await axios.post(serverUrl + '/api/auth/login', {
+      let result = await axios.post('/api/auth/login', {
         email,password
-      },{withCredentials:true})
+      })
       console.log(result.data);
       toast.success("Login successful!")
       setUserData(result.data.user)

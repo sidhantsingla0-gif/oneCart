@@ -68,30 +68,43 @@ try {
       <Nav/>
       <Sidebar/>
 
-      <div className='w-[82%] h-[100%] flex items-center justify-start overflow-x-hidden absolute right-0 bottom-[5%] mt-[70px]'> 
+      <div className="w-[82%] min-h-screen flex justify-center items-start pt-24 px-6 absolute right-0"> 
 
         <form action="" onSubmit={handleAddProduct} className='w-[100%] md:w-[90%] h-[100%] mt-[70px] flex flex-col gap-[30px] py-[30px] px-[20px] md:px-[60px]'>
         <div className='w-[400px] h-[50px] md:text-[40px] text-[25px] mt-[70px]'>Add Product Page</div>
         <div className='w-[80%] h-[130px] flex items-start justify-center flex-col gap-[10px] mt-[20px]'>
           <span className='text-[20px] md:text-[25px] font-semibold'>Upload Images</span>
-          <div className='w-[100%] h-[100%] flex items-center justify-start'>
-            <label htmlFor="image1" className='w-[65px] h-[65px] md:w-[100px] md:h-[100px] flex  cursor-pointer hover:border-[#46d1f7]'>
-              <img src={!image1 ? upload : URL.createObjectURL(image1)} alt="" className='w-[80%] h-[80%] rounded-lg shadow-2xl hover:border-[#1d1d1d] border-[2px]'/>
-              <input type="file" id='image1' className='hidden' onChange={(e) => setImage1(e.target.files[0])}/>
-            </label>
-            <label htmlFor="image2" className='w-[65px] h-[65px] md:w-[100px] md:h-[100px] flex  cursor-pointer hover:border-[#46d1f7]'>
-              <img src={!image2 ? upload : URL.createObjectURL(image2)} alt="" className='w-[80%] h-[80%] rounded-lg shadow-2xl hover:border-[#1d1d1d] border-[2px]'/>
-              <input type="file" id='image2' className='hidden' onChange={(e) => setImage2(e.target.files[0])}/>
-            </label>
-            <label htmlFor="image3" className='w-[65px] h-[65px] md:w-[100px] md:h-[100px] flex  cursor-pointer hover:border-[#46d1f7]'>
-              <img src={!image3 ? upload : URL.createObjectURL(image3)} alt="" className='w-[80%] h-[80%] rounded-lg shadow-2xl hover:border-[#1d1d1d] border-[2px]'/>
-              <input type="file" id='image3' className='hidden' onChange={(e) => setImage3(e.target.files[0])}/>
-            </label>
-            <label htmlFor="image4" className='w-[65px] h-[65px] md:w-[100px] md:h-[100px] flex  cursor-pointer hover:border-[#46d1f7]'>
-              <img src={!image4 ? upload : URL.createObjectURL(image4)} alt="" className='w-[80%] h-[80%] rounded-lg shadow-2xl hover:border-[#1d1d1d] border-[2px]'/>
-              <input type="file" id='image4' className='hidden' onChange={(e) => setImage4(e.target.files[0])}/>
-            </label>
-          </div>
+          <div>
+  <h2 className="text-xl font-semibold mb-4">Upload Images</h2>
+
+<p className="text-sm text-gray-400">
+  Select up to 4 images for product preview
+</p>
+
+  <div className="flex gap-4 flex-wrap">
+    {[image1, image2, image3, image4].map((img, index) => (
+      <label key={index} className="w-24 h-24 border-2 border-dashed border-gray-600 rounded-xl flex items-center justify-center cursor-pointer hover:border-blue-400 transition">
+        
+        <img
+          src={!img ? upload : URL.createObjectURL(img)}
+          className="w-full h-full object-cover rounded-xl"
+        />
+
+        <input
+          type="file"
+          hidden
+          onChange={(e) => {
+            const file = e.target.files[0];
+            if (index === 0) setImage1(file);
+            if (index === 1) setImage2(file);
+            if (index === 2) setImage3(file);
+            if (index === 3) setImage4(file);
+          }}
+        />
+      </label>
+    ))}
+  </div>
+</div>
         </div>
 
         <div className='w-[80%] h-[100px] flex items-start justify-center flex-col gap-[10px]'>

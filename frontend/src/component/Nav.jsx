@@ -1,166 +1,129 @@
 import React, { useContext, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import logo from '../assets/logo.png'
-import { IoSearchCircleOutline, IoSearchCircleSharp } from "react-icons/io5";
-import { IoMdHome } from "react-icons/io";
-import { FaCircleUser } from "react-icons/fa6";
-import { MdContacts } from "react-icons/md";
-import { HiOutlineCollection } from "react-icons/hi";
+import { IoSearch, IoClose } from "react-icons/io5";
 import { MdOutlineShoppingCart } from "react-icons/md";
 import { userDataContext } from '../context/UserContext.jsx';
 import { authDataContext } from '../context/authContext.jsx';
 import { shopDataContext } from '../context/ShopContext.jsx';
-import axios from 'axios';
+import axios from "../config/axios"
 
 function Nav() {
-  let { getCurrentUser, userData } = useContext(userDataContext)
-  let { serverUrl } = useContext(authDataContext)
-  let { showSearch, setShowSearch, search, setSearch, getCartCount } = useContext(shopDataContext)
-  let [showProfile, setShowProfile] = useState(false)
-  let navigate = useNavigate()
+
+  const { getCurrentUser, userData, setUserData } = useContext(userDataContext)
+  const { serverUrl } = useContext(authDataContext)
+  const { showSearch, setShowSearch, search, setSearch, getCartCount } = useContext(shopDataContext)
+
+  const [showProfile, setShowProfile] = useState(false)
+  const navigate = useNavigate()
 
   const handleLogout = async () => {
     try {
-      const result = await axios.get(serverUrl + '/api/auth/logout', { withCredentials: true });
-      getCurrentUser();
-      navigate('/login');
-      console.log(result.data);
+      await axios.get('/api/auth/logout');
+      setUserData(null)
+      navigate('/login')
     } catch (error) {
-      console.log(error);
+      console.log(error)
     }
-  };
-
-  const handleProfileClick = () => setShowProfile(prev => !prev)
+  }
 
   return (
-    <div className='w-full h-[70px] bg-[#ecfafaec] flex items-center justify-between px-[30px] shadow-md shadow-black relative'>
-      
-      {/* Logo */}
-      <div className='w-[20%] lg:w-[30%] flex items-center gap-[10px]'>
-        <img src={logo} alt="logo" className='w-[30px]'/>
-        <h1 className='text-[25px] text-black font-sans'>OneCart</h1>
-      </div>
+    <div className="w-full fixed top-0 left-0 z-50 bg-[#0f172a]/80 backdrop-blur-md border-b border-gray-700">
 
-     {/* Menu */}
-<div className='w-[50%] hidden md:flex items-center justify-center'>
-  <ul className='flex gap-[25px]'>
-    <li 
-      className='bg-black text-white px-6 py-2 rounded-md font-bold cursor-pointer hover:bg-gray-800 transition'
-      onClick={() => navigate("/")}
-    >
-      HOME
-    </li>
-    <li 
-      className='bg-black text-white px-6 py-2 rounded-md font-bold cursor-pointer hover:bg-gray-800 transition'
-      onClick={() => navigate("/collections")}
-    >
-      COLLECTIONS
-    </li>
-    <li 
-      className='bg-black text-white px-6 py-2 rounded-md font-bold cursor-pointer hover:bg-gray-800 transition'
-      onClick={() => navigate("/about")}
-    >
-      ABOUT
-    </li>
-    <li 
-      className='bg-black text-white px-6 py-2 rounded-md font-bold cursor-pointer hover:bg-gray-800 transition'
-      onClick={() => navigate("/contact")}
-    >
-      CONTACT
-    </li>
-  </ul>
-</div>
+      <div className="max-w-7xl mx-auto flex items-center justify-between px-4 py-3 text-white">
 
+        {/* LOGO */}
+        <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/")}>
+          <img src={logo} alt="logo" className="w-8" />
+          <h1 className="text-lg font-semibold">OneCart</h1>
+        </div>
 
-      {/* Right side */}
-      <div className='w-[30%] flex items-center justify-end gap-[20px]'>
-        {!showSearch && <IoSearchCircleOutline className='w-[38px] h-[38px] text-black cursor-pointer' onClick={()=>{setShowSearch(prev=>!prev);navigate("/collections")}}/>}
-        {showSearch && <IoSearchCircleSharp className='w-[38px] h-[38px] text-black cursor-pointer' onClick={()=>setShowSearch(prev=>!prev)}/>}
+        {/* MENU */}
+        <div className="hidden md:flex items-center gap-6 text-sm">
+          <button onClick={() => navigate("/")} className="hover:text-gray-300">Home</button>
+          <button onClick={() => navigate("/collections")} className="hover:text-gray-300">Collections</button>
+          <button onClick={() => navigate("/about")} className="hover:text-gray-300">About</button>
+          <button onClick={() => navigate("/contact")} className="hover:text-gray-300">Contact</button>
+        </div>
 
-        {!userData && <FaCircleUser className='w-[29px] h-[29px] text-black cursor-pointer' onClick={handleProfileClick} />}
-        {userData && (
-          <div className='w-[30px] h-[30px] bg-[#080808] text-white rounded-full flex items-center justify-center cursor-pointer' onClick={handleProfileClick}>
-            {userData?.name?.slice(0, 1)}
+        {/* RIGHT */}
+        <div className="flex items-center gap-4">
+
+          {/* SEARCH */}
+          <button onClick={() => setShowSearch(prev => !prev)}>
+            {showSearch ? <IoClose size={22} /> : <IoSearch size={22} />}
+          </button>
+
+          {/* CART */}
+          <div className="relative cursor-pointer" onClick={() => navigate("/cart")}>
+            <MdOutlineShoppingCart size={24} />
+            <span className="absolute -top-2 -right-2 bg-red-600 text-xs w-5 h-5 flex items-center justify-center rounded-full">
+              {getCartCount()}
+            </span>
           </div>
-        )}
 
-        {/* Cart with badge */}
-        <div className='relative'>
-          <MdOutlineShoppingCart className='w-[30px] h-[30px] text-black cursor-pointer hidden md:block' onClick={()=>navigate("/cart")}/>
-          <span className='absolute -top-3 -right-3 flex items-center justify-center w-6 h-6 bg-red-600 text-white text-xs font-bold rounded-full shadow-md hidden md:flex'>
-            {getCartCount()}
-          </span>
+          {/* USER */}
+          <div
+            onClick={() => setShowProfile(prev => !prev)}
+            className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center cursor-pointer text-sm"
+          >
+            {userData ? userData?.name?.slice(0, 1) : "U"}
+          </div>
+
         </div>
+
       </div>
 
-      {/* Search bar */}
+      {/* SEARCH BAR */}
       {showSearch && (
-        <div className='w-full h-[80px] bg-[#d8f6f9dd] absolute top-full left-0 flex items-center justify-center'>
-          <input type="text" placeholder='Search...' className='lg:w-[50%] w-[80%] h-[60%] bg-[#233533] rounded-[30px] px-[50px] placeholder:text-white text-[18px]' onChange={(e)=>setSearch(e.target.value)} value={search}/>
+        <div className="w-full bg-[#0f172a] border-t border-gray-700 flex justify-center py-4">
+          <input
+            type="text"
+            placeholder="Search products..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-[90%] md:w-[50%] px-4 py-2 rounded-md bg-gray-800 text-white outline-none"
+          />
         </div>
       )}
 
-     {/* Profile dropdown */}
-{showProfile && (
-  <div className="absolute w-[220px] top-[110%] right-[4%] bg-[#111] border border-gray-600 rounded-lg z-10 shadow-xl">
-    <ul className="flex flex-col text-[16px] py-2 text-white">
-      {!userData && (
-        <li
-          className="px-4 py-2 hover:bg-gray-700 cursor-pointer transition rounded-md"
-          onClick={() => {
-            navigate('/login');
-            setShowProfile(false);
-          }}
-        >
-          Login
-        </li>
-      )}
-      {userData && (
-        <li
-          className="px-4 py-2 hover:bg-gray-700 cursor-pointer transition rounded-md"
-          onClick={() => {
-            handleLogout();
-            setShowProfile(false);
-          }}
-        >
-          LogOut
-        </li>
-      )}
-      <li
-        className="px-4 py-2 hover:bg-gray-700 cursor-pointer transition rounded-md"
-        onClick={() => {
-          navigate('/order');
-          setShowProfile(false);
-        }}
-      >
-        Orders
-      </li>
-      <li
-        className="px-4 py-2 hover:bg-gray-700 cursor-pointer transition rounded-md"
-        onClick={() => {
-          navigate('/about');
-          setShowProfile(false);
-        }}
-      >
-        About
-      </li>
-    </ul>
-  </div>
-)}
+      {/* PROFILE DROPDOWN */}
+      {showProfile && (
+        <div className="absolute right-4 mt-2 w-44 bg-[#111] text-white border border-gray-600 rounded-lg shadow-lg text-sm">
+          {!userData && (
+            <div
+              className="px-4 py-2 hover:bg-gray-700 cursor-pointer"
+              onClick={() => navigate('/login')}
+            >
+              Login
+            </div>
+          )}
 
+          {userData && (
+            <div
+              className="px-4 py-2 hover:bg-gray-700 cursor-pointer"
+              onClick={handleLogout}
+            >
+              Logout
+            </div>
+          )}
 
-      {/* Mobile bottom nav */}
-      <div className='w-full h-[90px] flex items-center justify-between px-[20px] text-[12px] fixed bottom-0 left-0 bg-[#191818] shadow-md shadow-black z-10 md:hidden'>
-        <button className='mobile-btn' onClick={()=>navigate("/")}><IoMdHome className='w-[25px] h-[25px]'/>Home</button>
-        <button className='mobile-btn' onClick={()=>navigate("/collections")}><HiOutlineCollection className='w-[25px] h-[25px]'/>Collections</button>
-        <button className='mobile-btn' onClick={()=>navigate("/contact")}><MdContacts className='w-[25px] h-[25px]'/>Contact</button>
-        <div className='relative'>
-          <MdOutlineShoppingCart className='w-[25px] h-[25px]' onClick={()=>navigate("/cart")}/>
-          <span className='absolute -top-2 -right-2 flex items-center justify-center w-6 h-6 bg-red-600 text-white text-xs font-bold rounded-full shadow-md'>
-            {getCartCount()}
-          </span>
+          <div
+            className="px-4 py-2 hover:bg-gray-700 cursor-pointer"
+            onClick={() => navigate('/order')}
+          >
+            Orders
+          </div>
+
+          <div
+            className="px-4 py-2 hover:bg-gray-700 cursor-pointer"
+            onClick={() => navigate('/about')}
+          >
+            About
+          </div>
         </div>
-      </div>
+      )}
+
     </div>
   )
 }

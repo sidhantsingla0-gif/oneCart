@@ -1,49 +1,30 @@
 import React, { useEffect, useState, useContext } from "react";
 import { authDataContext } from "./authContext.jsx";
-import { userDataContext } from "./UserContext.jsx"; // ✅ import userDataContext so we can check login
-import axios from "axios";
-
+import { userDataContext } from "./UserContext.jsx";
+import axios from "../config/axios"
+import useProducts from "../hooks/useProducts";
 export const shopDataContext = React.createContext();
 
 function ShopContext({ children }) {
-  const [products, setProducts] = useState([]);
+  
   const [search, setSearch] = useState("");
   const [showSearch, setShowSearch] = useState(false);
   const { serverUrl } = useContext(authDataContext);
-  const { userData } = useContext(userDataContext); // ✅ get userData
+  const { userData } = useContext(userDataContext);
   const [cartItems, setCartItems] = useState({});
   const currency = "₹";
   const delivery_fee = 40;
 
-  // Fetch products
-  const getProducts = async () => {
-    try {
-      const result = await axios.get(serverUrl + "/api/product/list", {
-        withCredentials: true,
-      });
-      setProducts(result.data);
-      console.log("Products loaded:", result.data);
-    } catch (error) {
-      console.error("Error loading products:", error.message);
-    }
-  };
+  const { products, loading, error } = useProducts();
 
-  // Add to cart (local + server sync if logged in)
   const addToCart = async (itemId, size) => {
-    if (!size) {
-      console.log("Select product size");
-      return;
-    }
+    if (!size) return console.log("Select product size");
 
-    // Local cart update
     let cartData = structuredClone(cartItems);
 
     if (cartData[itemId]) {
-      if (cartData[itemId][size]) {
-        cartData[itemId][size] += 1;
-      } else {
-        cartData[itemId][size] = 1;
-      }
+      if (cartData[itemId][size]) cartData[itemId][size] += 1;
+      else cartData[itemId][size] = 1;
     } else {
       cartData[itemId] = {};
       cartData[itemId][size] = 1;
@@ -51,15 +32,13 @@ function ShopContext({ children }) {
 
     setCartItems(cartData);
 
-    // Server sync if logged in
     if (userData) {
       try {
-       let result = await axios.post(
+        await axios.post(
           serverUrl + "/api/cart/add",
           { itemId, size },
           { withCredentials: true }
         );
-        console.log(result);
       } catch (error) {
         console.error("Error adding to cart:", error.message);
       }
@@ -67,29 +46,34 @@ function ShopContext({ children }) {
   };
 
   const getUserCart = async () => {
-    try {
-      const result = await axios.post(serverUrl + "/api/cart/get", {}, { withCredentials: true });
-        setCartItems(result.data.cartData || {});
-      } catch (error) {
-        console.error("Error fetching user cart:", error.message);
-      }
-    };
-
-    const updateQuantity = async (itemId, size, quantity) => {
-        try {
-            let cartData = structuredClone(cartItems);
-            cartData[itemId][size] = quantity;
-            setCartItems(cartData);
-
-            if (userData) {
-                await axios.post(serverUrl + "/api/cart/update", { itemId, size, quantity }, { withCredentials: true });
-            }
-        } catch (error) {
-            console.error("Error updating cart quantity:", error.message);
-        }
+  try {
+    const result = await axios.post("/api/cart/get",
+      {}
+    );
+    setCartItems(result.data.cartData || {});
+  } catch (error) {
+    if (error.response?.status !== 401) {
+      console.error("Error fetching cart:", error.message);
     }
+  }
+};
 
-  // Count items in cart
+  const updateQuantity = async (itemId, size, quantity) => {
+    try {
+      let cartData = structuredClone(cartItems);
+      cartData[itemId][size] = quantity;
+      setCartItems(cartData);
+
+      if (userData) {
+        await axios.post("/api/cart/update",
+          { itemId, size, quantity }
+        );
+      }
+    } catch (error) {
+      console.error("Error updating cart quantity:", error.message);
+    }
+  };
+
   const getCartCount = () => {
     let totalCount = 0;
     try {
@@ -106,39 +90,43 @@ function ShopContext({ children }) {
     return totalCount;
   };
 
-  useEffect(() => {
-    getProducts();
-    getUserCart();
-  }, []);
+  
 
- const getCartAmount = () => {
-  let totalAmount = 0;
+useEffect(() => {
+  if (userData) {
+    getUserCart(); // ✅ only when logged in
+  }
+}, [userData]);
 
-  try {
-    for (const itemId in cartItems) {
-      const itemInfo = products.find((product) => product._id === itemId);
+  const getCartAmount = () => {
+    let totalAmount = 0;
 
-      if (itemInfo) {
-        for (const size in cartItems[itemId]) {
-          const quantity = cartItems[itemId][size];
-          if (quantity > 0) {
-            totalAmount += itemInfo.price * quantity;
+    try {
+      for (const itemId in cartItems) {
+        const itemInfo = products.find(
+          (product) => product._id === itemId
+        );
+
+        if (itemInfo) {
+          for (const size in cartItems[itemId]) {
+            const quantity = cartItems[itemId][size];
+            if (quantity > 0) {
+              totalAmount += itemInfo.price * quantity;
+            }
           }
         }
       }
+    } catch (error) {
+      console.error("Error calculating cart amount:", error.message);
     }
-  } catch (error) {
-    console.error("Error calculating cart amount:", error.message);
-  }
 
-  return totalAmount;
-}; // ✅ this closing brace was missing
+    return totalAmount;
+  };
 
   const value = {
     products,
     currency,
     delivery_fee,
-    getProducts,
     search,
     setSearch,
     showSearch,

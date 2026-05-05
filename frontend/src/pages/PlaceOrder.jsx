@@ -5,7 +5,7 @@ import CartTotal from "../component/cartTotal";
 import razorpay from "../assets/Razorpay.png"
 import { shopDataContext } from "../context/ShopContext.jsx";
 import { authDataContext } from "../context/authContext";
-import axios from "axios";
+import axios from "../config/axios"
 import { toast } from 'react-toastify';
 
 function PlaceOrder() {
@@ -49,7 +49,7 @@ function PlaceOrder() {
             console.log(response)
             // Here, send the response to backend to verify payment
             try {
-              const { data } = await axios.post(serverUrl + '/api/order/verifyrazorpay', response, { withCredentials: true });
+              const { data } = await axios.post('/api/order/verifyrazorpay', response);
               if (data.success) {
                 setCartItems({});
                 toast.success("Payment successful!")
@@ -98,7 +98,7 @@ function PlaceOrder() {
 
     switch (method) {
         case "cod":
-            const result = await axios.post(serverUrl + '/api/order/placeorder', orderData, { withCredentials: true });
+            const result = await axios.post('/api/order/placeorder', orderData);
             console.log(result.data);
             if(result.data) {
                 setCartItems({});
@@ -109,7 +109,7 @@ function PlaceOrder() {
             }
             break;
             case "razorpay":
-            const resultRazorpay = await axios.post(serverUrl + '/api/order/razorpay', orderData, { withCredentials: true });
+            const resultRazorpay = await axios.post('/api/order/razorpay', orderData);
             initPay(resultRazorpay.data.order);
             break;
 

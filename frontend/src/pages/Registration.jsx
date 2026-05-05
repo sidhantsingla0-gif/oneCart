@@ -5,7 +5,7 @@ import { IoEye } from "react-icons/io5";
 import { useNavigate } from 'react-router-dom'
 import { authDataContext } from '../context/authContext.jsx'
 import { userDataContext } from '../context/UserContext.jsx'
-import axios from 'axios'
+import axios from "../config/axios"
 import { signInWithPopup } from 'firebase/auth';
 import { auth, provider } from '../../utils/Firebase.js';
 import { toast } from 'react-toastify';
@@ -24,15 +24,15 @@ const handleSignUp = async (e) => {
   e.preventDefault()
   setIsLoading(true)
   try {
-    const result = await axios.post(serverUrl + '/api/auth/registration', {
+    const result = await axios.post('/api/auth/registration', {
   name,email,password
-    },{withCredentials:true})
+    })
     console.log(result.data);
     toast.success("Registration successful!")
-    setUserData(result.data.user);
-    navigate("/")
+    await getCurrentUser();   // ✅ ensures auth sync
+navigate("/");
   } catch (error) {
-  console.log(error);
+  console.log(error.response?.data || error.message);
   toast.error(error.response?.data?.message || "Registration failed")
   } finally {
     setIsLoading(false)
@@ -47,9 +47,9 @@ const handleSignUp = async (e) => {
       let name = user.displayName;
       let email = user.email;
 
-    const result = await axios.post(serverUrl + '/api/auth/googleLogin', {
+    const result = await axios.post('/api/auth/googleLogin', {
   name,email
-    },{withCredentials:true})
+    })
     console.log(result.data); 
     toast.success("Google registration successful!")
     setUserData(result.data.user);

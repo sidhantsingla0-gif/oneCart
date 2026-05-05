@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import Tittle from "../component/Tittle";
 import { shopDataContext } from "../context/ShopContext";
 import { authDataContext } from "../context/authContext";
-import axios from "axios";
+import axios from "../config/axios"
 
 function Order() {
   const [orderData, setOrderData] = useState([]);
@@ -12,11 +12,8 @@ function Order() {
 
   const loadOrderData = async () => {
     try {
-      const result = await axios.post(
-        serverUrl + "/api/order/userorders",
-        {},
-        { withCredentials: true }
-      );
+      const result = await axios.post("/api/order/userorders",
+        {});
 
       if (result.data) {
         let allOrdersItem = [];

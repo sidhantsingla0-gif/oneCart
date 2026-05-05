@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from "../config/axios"
 import React, { createContext, useState, useEffect, useContext } from 'react'
 import { authDataContext } from './authContext.jsx';
 
@@ -10,7 +10,7 @@ function UserContext({children}) {
     const getCurrentUser = async () => {
         if (!serverUrl) return
         try {
-            const result = await axios.get(serverUrl + '/api/user/getCurrentUser', { withCredentials: true })
+            const result = await axios.get('/api/user/getCurrentUser')
             setUserData(result.data?.user ?? null)
             if (result.data?.user) console.log('User logged in:', result.data.user)
         } catch (error) {
@@ -22,9 +22,7 @@ function UserContext({children}) {
         }
     }
 
-    useEffect(() => {
-        if (serverUrl) getCurrentUser()
-    }, [serverUrl])
+    // Removed useEffect to prevent unnecessary API calls
 
     const value = {
         userData,

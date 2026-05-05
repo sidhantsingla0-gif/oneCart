@@ -7,13 +7,14 @@ import { useNavigate } from 'react-router-dom'
 import { RiDeleteBinLine } from "react-icons/ri";
 
 function Cart() {
+
   const { products, cartItems, currency, updateQuantity } = React.useContext(shopDataContext)
   const { serverUrl } = React.useContext(authDataContext)
   const [cartProducts, setCartProducts] = React.useState([])
   const navigate = useNavigate()
 
   React.useEffect(() => {
-    const tempData = [];
+    const tempData = []
     for (let items in cartItems) {
       for (let item in cartItems[items]) {
         if (cartItems[items][item] > 0) {
@@ -21,86 +22,106 @@ function Cart() {
             _id: items,
             size: item,
             quantity: cartItems[items][item]
-          });
+          })
         }
       }
     }
-    setCartProducts(tempData);
-  }, [cartItems, products]);
+    setCartProducts(tempData)
+  }, [cartItems, products])
 
   return (
-    <div className='w-[99vw] min-h-[100vh] p-[20px] overflow-hidden bg-gradient-to-r from-[#141414] to-[#0c2025]'>
-      <div className='h-[8%] w-full text-center mt-[80px]'>
-        <Tittle text1={'YOUR'} text2={'CART'}/>
-      </div>
+    <div className="w-full min-h-screen bg-gradient-to-r from-[#141414] to-[#0c2025] text-white py-10 px-4">
 
-      <div className='w-full h-[92%] flex flex-wrap gap-[20px]'>
-        {cartProducts.map((item, index) => {
-          const productData = products.find(product => product._id === item._id);
+      <div className="max-w-6xl mx-auto">
 
-          // ✅ Fix image path like in Order
-          const imagePath = productData?.image1 ? productData.image1.replace("public/", "") : "";
-          const imageUrl = imagePath ? `${serverUrl}/${imagePath}` : "";
+        {/* TITLE */}
+        <div className="text-center mb-10">
+          <Tittle text1={'YOUR'} text2={'CART'} />
+        </div>
 
-          return (
-            <div key={index} className='w-[100%] h-[10%] border-t border-b'>
-              <div className='w-[100%] h-[80%] flex items-start gap-6 bg-[#51808048] py-[10px] px-[20px] rounded-2xl relative'>
+        {/* CART ITEMS */}
+        <div className="flex flex-col gap-6">
+
+          {cartProducts.map((item, index) => {
+
+            const productData = products.find(p => p._id === item._id)
+
+            const imagePath = productData?.image1 ? productData.image1.replace("public/", "") : ""
+            const imageUrl = imagePath ? `${serverUrl}/${imagePath}` : ""
+
+            return (
+              <div key={index}
+                className="flex flex-col md:flex-row items-center gap-6 
+                bg-[#ffffff0a] border border-gray-700 rounded-xl p-4">
+
+                {/* IMAGE */}
                 <img
                   src={imageUrl}
-                  alt={productData?.name || "product"}
-                  className='w-[100px] h-[100px] object-cover rounded-md'
+                  alt={productData?.name}
+                  className="w-24 h-24 object-cover rounded-md"
                 />
-                <div className="flex items-start justify-center flex-col gap-[10px]">
-                  <p className="md:text-[25px] text-[20px] text-[#f3f9fc]">
+
+                {/* INFO */}
+                <div className="flex-1 flex flex-col gap-2 text-center md:text-left">
+                  <p className="text-lg font-semibold">
                     {productData?.name}
                   </p>
-                  <div className="flex items-center gap-[20px]">
-                    <p className="text-[20px] text-[#aaf4e7]">
-                      {currency}{productData?.price}
-                    </p>
-                    <p className="w-[40px] h-[40px] text-[16px] text-white bg-[#51808b4] rounded-md mt-[5px] flex items-center justify-center border-[1px] border-[#9ff9f9]">
-                      {item.size}
-                    </p>
+
+                  <div className="flex items-center justify-center md:justify-start gap-4 text-sm text-gray-300">
+                    <span>{currency}{productData?.price}</span>
+                    <span className="px-2 py-1 border border-gray-500 rounded">
+                      Size: {item.size}
+                    </span>
                   </div>
                 </div>
+
+                {/* QUANTITY */}
                 <input
                   type="number"
                   min={1}
-                  defaultValue={item.quantity}
-                  className="md:max-w-20 max-w-10 md:py-2 py-[5px] px-[10px] text-white text-[18px] font-semibold bg-[#51888b04] absolute md:top-[40%] top-[46%] left-[75%] md:left-[50%] border-[1px] border-[#9ff9f9] rounded-md"
+                  value={item.quantity}
                   onChange={(e) =>
-                    e.target.value === '' || e.target.value === null
-                      ? null
-                      : updateQuantity(item._id, item.size, Number(e.target.value))
+                    updateQuantity(item._id, item.size, Number(e.target.value))
                   }
+                  className="w-16 px-2 py-1 bg-transparent border border-gray-500 rounded text-center"
                 />
-                <RiDeleteBinLine
-                  className='text-[#9ff9f9] w-[25px] h-[25px] absolute top-[50px] md:top-[40px] md:right-[5%] right-1'
-                  onClick={() => updateQuantity(item._id, item.size, 0)}
-                />
-              </div>
-            </div>
-          )
-        })}
-      </div>
 
-      <div className='flex justify-start items-end my-20'>
-        <div className='w-full sm:w-[450px]'>
-          <CartTotal />
+                {/* DELETE */}
+                <RiDeleteBinLine
+                  onClick={() => updateQuantity(item._id, item.size, 0)}
+                  className="text-red-400 w-6 h-6 cursor-pointer hover:scale-110 transition"
+                />
+
+              </div>
+            )
+          })}
+
+        </div>
+
+        {/* TOTAL + BUTTON */}
+        <div className="mt-12 flex flex-col items-end gap-4">
+
+          <div className="w-full sm:w-[400px]">
+            <CartTotal />
+          </div>
+
           <button
-            className="hover:bg-slate-500 cursor-pointer bg-[#5188048] py-[10px] px-[50px] rounded-2xl text-white flex items-center justify-center gap-[20px] border-[1px] border-[#8088049] ml-[30px] mt-[20px]"
             onClick={() => {
               if (cartProducts.length > 0) {
-                navigate("/placeorder");
+                navigate("/placeorder")
               } else {
-                console.log("your cart is empty!")
+                alert("Cart is empty")
               }
             }}
+            className="bg-white text-black px-6 py-3 rounded-md hover:bg-gray-200 transition"
           >
             PROCEED TO CHECKOUT
           </button>
+
         </div>
+
       </div>
+
     </div>
   )
 }
