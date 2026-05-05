@@ -27,8 +27,8 @@ export const registration = async (req, res) => {
         let token = await genToken(user._id);
         res.cookie("token", token, {
     httpOnly: true,
-    secure: false,        // MUST be false in localhost
-    sameSite: "lax",      // stable for dev
+    secure: true,
+    sameSite: "none",
     maxAge: 7 * 24 * 60 * 60 * 1000
 });
         const safeUser = user.toObject();
@@ -56,8 +56,8 @@ export const login = async (req, res) => {
         let token = await genToken(user._id);
         res.cookie("token", token, {
     httpOnly: true,
-    secure: false,        // MUST be false in localhost
-    sameSite: "lax",      // stable for dev
+    secure: true,        
+    sameSite: "none",     
     maxAge: 7 * 24 * 60 * 60 * 1000
 });
         const safeUser = user.toObject();
@@ -100,8 +100,8 @@ export const googleLogin = async (req, res) => {
         let token = await genToken(existUser._id);
         res.cookie("token", token, {
     httpOnly: true,
-    secure: false,        // MUST be false in localhost
-    sameSite: "lax",      // stable for dev
+    secure: true,        
+    sameSite: "none",      
     maxAge: 7 * 24 * 60 * 60 * 1000
 });
         const safeUser = existUser.toObject();
@@ -120,8 +120,8 @@ export const adminLogin = async (req, res) => {
             let token = await genToken1(email);
 res.cookie("token", token, {
     httpOnly: true,
-    secure: false,        // MUST be false in localhost
-    sameSite: "lax",      // stable for dev
+    secure: true,        
+    sameSite: "none",
     maxAge: 7 * 24 * 60 * 60 * 1000
 });
             return res.status(200).json({ message: "Admin logged in successfully" });
