@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
-import { authDataContext } from "./authContext.jsx";
+import { authDataContext } from "./AuthContext.jsx";
 import { userDataContext } from "./UserContext.jsx";
 import axios from "../config/axios"
 import useProducts from "../hooks/useProducts";
