@@ -4,7 +4,7 @@ import Tittle from "../component/Tittle";
 import CartTotal from "../component/cartTotal";
 import razorpay from "../assets/Razorpay.png"
 import { shopDataContext } from "../context/ShopContext.jsx";
-import { authDataContext } from "../context/authContext";
+import { authDataContext } from "../context/AuthContext";
 import axios from "../config/axios"
 import { toast } from 'react-toastify';
 
