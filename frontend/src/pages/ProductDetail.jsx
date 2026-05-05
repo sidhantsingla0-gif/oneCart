@@ -1,7 +1,7 @@
 import React, { useEffect, useContext, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { shopDataContext } from '../context/ShopContext'
-import { authDataContext } from '../context/authContext'
+import { authDataContext } from '../context/AuthContext'
 import { FaStar, FaStarHalfAlt } from "react-icons/fa"
 import RelatedProduct from '../component/RelatedProduct'
 
