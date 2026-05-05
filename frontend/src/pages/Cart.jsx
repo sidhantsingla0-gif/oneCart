@@ -2,7 +2,7 @@ import React from 'react'
 import CartTotal from '../component/cartTotal.jsx'
 import Tittle from '../component/Tittle'
 import { shopDataContext } from '../context/ShopContext.jsx'
-import { authDataContext } from '../context/authContext'
+import { authDataContext } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import { RiDeleteBinLine } from "react-icons/ri";
 
