@@ -4,7 +4,7 @@ import logo from '../assets/logo.png'
 import { IoSearch, IoClose } from "react-icons/io5";
 import { MdOutlineShoppingCart } from "react-icons/md";
 import { userDataContext } from '../context/UserContext.jsx';
-import { authDataContext } from '../context/authContext.jsx';
+import { authDataContext } from '../context/AuthContext.jsx';
 import { shopDataContext } from '../context/ShopContext.jsx';
 import axios from "../config/axios"
 
