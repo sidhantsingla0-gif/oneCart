@@ -1,6 +1,6 @@
 import axios from "../config/axios"
 import React, { createContext, useState, useEffect, useContext } from 'react'
-import { authDataContext } from './authContext.jsx';
+import { authDataContext } from './AuthContext.jsx';
 
 export const userDataContext = createContext()
 function UserContext({children}) {
