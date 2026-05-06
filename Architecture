@@ -1,0 +1,16 @@
+## 🧠 Architecture
+
+The application follows a client-server architecture:
+
+- Frontend (React) communicates with Backend (Express) using REST APIs
+- Axios is used for API requests
+- JWT is used for authentication and protected routes
+- MongoDB stores users, products, and cart data
+- Context API manages global state (user, cart, products)
+
+### Flow:
+1. User logs in (JWT / Google OAuth)
+2. Token stored on client
+3. Requests include token
+4. Backend validates token
+5. Data fetched from MongoDB
