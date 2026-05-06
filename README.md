@@ -7,7 +7,7 @@ This project demonstrates real-world full-stack development practices including 
 
 ## 🚀 Live Demo
 
-👉 https://onecart-frontend3.onrender.com/login
+👉 https://onecart-frontend3.onrender.com/
 
 ---
 
@@ -23,10 +23,6 @@ This project demonstrates real-world full-stack development practices including 
 - Best sellers & latest collections
 - Toast notifications for actions
 
-
-### 🏠 Home Page
-![Home](./screenshots/home.png)
-
 ---
 
 ### 🛠️ Admin Panel
@@ -34,20 +30,27 @@ This project demonstrates real-world full-stack development practices including 
 - Upload product images (FormData)
 - Manage product details (price, sizes, category)
 - Toggle bestseller status
+- View product list
 - Responsive UI (mobile + desktop)
 
+---
 
-### Add page
-![Add](./screenshots/adminAdd.png)
+## 🔐 Roles
+
+- **User** → Browse products, manage cart  
+- **Admin** → Manage products and inventory  
+
 ---
 
 ## ⚙️ System Features
 - JWT-based authentication
 - Protected routes
+- Role-based access control (Admin & User)
 - Centralized API handling (Axios instance)
 - React Context API for global state management
 - Custom hooks (e.g. `useProducts`)
 - MongoDB database integration
+- Environment-based admin authentication
 
 ---
 
@@ -88,16 +91,49 @@ The application follows a client-server architecture:
 4. Backend validates token
 5. Data fetched from MongoDB
 
+---
+
+## 📸 Screenshots
+
+### 🏠 Home Page
+![Home](./screenshots/home.png)
+
+### 🛍️ Collection Page
+![Collection](./screenshots/collection.png)
+
+### 📦 Product / Order Page
+![Order](./screenshots/order.png)
+
+### 🛒 Place Order Page
+![Place Order](./screenshots/placeorder.png)
+
+### 🛠️ Admin Add Product
+![Admin Add](./screenshots/adminAdd.png)
+
+### 📋 Admin Product List
+![Admin List](./screenshots/adminList.png)
 
 ---
 
+## 🔐 Admin Access
+
+The admin panel is protected using environment-based authentication.
+
+👉 Admin Route:  
+(https://onecart-admin3.onrender.com/)
+Note:
+- Admin access is secured via a password stored in backend environment variables
+- Credentials are not publicly exposed for security reasons
+- For demo access, please contact the developer
+
+
+---
 
 ## 📁 Project Structure
-
 ```bash
 oneCart/
 │
-├── frontend/
+├── frontend/        # User-facing application
 │   ├── src/
 │   │   ├── components/
 │   │   ├── pages/
@@ -106,35 +142,21 @@ oneCart/
 │   │   ├── config/
 │   │   └── App.jsx
 │
-├── backend/
+├── admin/           # Admin dashboard
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── context/
+│   │   ├── config/
+│   │   └── App.jsx
+│
+├── backend/         # API server
 │   ├── controllers/
 │   ├── models/
 │   ├── routes/
 │   ├── middleware/
 │   └── server.js
 ```
-
----
-
-## Sreenshots
-
-### Home Page
-![Home](./screenshots/home.png)
-
-### Order Page
-![Order](./screenshots/order.png)
-
-### Collection Page
-![Collection](./screenshots/collection.png)
-
-### Place Order Page
-![Place Order](./screenshots/placeorder.png)
-
-### Admin Add Page
-![Admin Add](./screenshots/adminAdd.png)
-
-### Admin List Page
-![Admin List](./screenshots/adminList.png)
 
 ---
 
@@ -156,6 +178,7 @@ oneCart/
 ### 1.Clone the repository
 
 git clone https://github.com/your-username/oneCart.git
+
 cd oneCart
 
 ### 2.Install dependencies
@@ -168,6 +191,11 @@ npm install
 #### Frontend:
 
 cd frontend
+npm install
+
+#### Admin:
+
+cd Admin
 npm install
 
 ## 3.Setup environment variables
@@ -196,6 +224,11 @@ npm start
 
 
 ### Start frontend:
+
+npm run dev
+
+
+### Start Admin:
 
 npm run dev
 
