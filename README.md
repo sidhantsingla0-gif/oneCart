@@ -23,6 +23,10 @@ This project demonstrates real-world full-stack development practices including 
 - Best sellers & latest collections
 - Toast notifications for actions
 
+
+### 🏠 Home Page
+![Home](./screenshots/home.png)
+
 ---
 
 ### 🛠️ Admin Panel
@@ -32,6 +36,9 @@ This project demonstrates real-world full-stack development practices including 
 - Toggle bestseller status
 - Responsive UI (mobile + desktop)
 
+
+### Add page
+![Add](./screenshots/adminAdd.png)
 ---
 
 ## ⚙️ System Features
@@ -85,6 +92,28 @@ oneCart/
 │   ├── middleware/
 │   └── server.js
 ```
+
+---
+
+## Sreenshots
+
+### Home Page
+![Home](./screenshots/home.png)
+
+### Order Page
+![Order](./screenshots/order.png)
+
+### Collection Page
+![Collection](./screenshots/collection.png)
+
+### Place Order Page
+![Place Order](./screenshots/placeorder.png)
+
+### Admin Add Page
+![Admin Add](./screenshots/adminAdd.png)
+
+### Admin List Page
+![Admin List](./screenshots/adminList.png)
 
 ---
 
