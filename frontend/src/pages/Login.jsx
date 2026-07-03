@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import { authDataContext } from '../context/AuthContext.jsx';
 import { userDataContext } from '../context/UserContext.jsx';
 import axios from "../config/axios"
-import { signInWithRedirect, getRedirectResult } from 'firebase/auth';
+import { signInWithPopup } from 'firebase/auth';
 import { auth, provider } from '../../utils/Firebase.js';
 import { isInAppBrowser } from '../../utils/isWebView.js';
 import { toast } from 'react-toastify';
@@ -22,34 +22,6 @@ function Login() {
 
 
   let navigate = useNavigate()
-
-  // Handles the return trip from Google after signInWithRedirect.
-  useEffect(() => {
-    const finishGoogleLogin = async () => {
-      try {
-        const response = await getRedirectResult(auth)
-        if (!response) return // not returning from a redirect, nothing to do
-
-        const user = response.user
-        const name = user.displayName
-        const email = user.email
-
-        const result = await axios.post(serverUrl + '/api/auth/googleLogin', {
-          name, email
-        }, { withCredentials: true })
-        toast.success("Google login successful!")
-        setUserData(result.data.user)
-        navigate("/")
-      } catch (error) {
-        console.log(error)
-        if (error?.code !== 'auth/no-current-user') {
-          toast.error("Google login failed")
-        }
-      }
-    }
-    finishGoogleLogin()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   const handleLogin = async (e) => {
     e.preventDefault()
@@ -79,12 +51,21 @@ function Login() {
       }
       setIsLoading(true)
       try {
-        await signInWithRedirect(auth, provider);
-        // Browser navigates away to Google here; result is handled by
-        // getRedirectResult in the useEffect above once we return.
+        const response = await signInWithPopup(auth, provider)
+        const user = response.user
+        const name = user.displayName
+        const email = user.email
+
+        const result = await axios.post(serverUrl + '/api/auth/googleLogin', {
+          name, email
+        }, { withCredentials: true })
+        toast.success("Google login successful!")
+        setUserData(result.data.user)
+        navigate("/")
       } catch (error) {
         console.log(error);
         toast.error("Google login failed")
+      } finally {
         setIsLoading(false)
       }
     }
