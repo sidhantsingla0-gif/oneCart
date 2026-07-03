@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import { authDataContext } from '../context/AuthContext.jsx'
 import { userDataContext } from '../context/UserContext.jsx'
 import axios from "../config/axios"
-import { signInWithRedirect, getRedirectResult } from 'firebase/auth';
+import { signInWithPopup } from 'firebase/auth';
 import { auth, provider } from '../../utils/Firebase.js';
 import { isInAppBrowser } from '../../utils/isWebView.js';
 import { toast } from 'react-toastify';
@@ -21,34 +21,6 @@ let { getCurrentUser, setUserData } = useContext(userDataContext)
 let [name, setName] = useState("")
 let [email, setEmail] = useState("")
 let [password, setPassword] = useState("")
-
-// Handles the return trip from Google after signInWithRedirect.
-useEffect(() => {
-  const finishGoogleSignUp = async () => {
-    try {
-      const response = await getRedirectResult(auth)
-      if (!response) return // not returning from a redirect, nothing to do
-
-      const user = response.user
-      const name = user.displayName
-      const email = user.email
-
-      const result = await axios.post('/api/auth/googleLogin', {
-        name, email
-      })
-      toast.success("Google registration successful!")
-      setUserData(result.data.user)
-      navigate("/")
-    } catch (error) {
-      console.log(error)
-      if (error?.code !== 'auth/no-current-user') {
-        toast.error("Google registration failed")
-      }
-    }
-  }
-  finishGoogleSignUp()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [])
 
 const handleSignUp = async (e) => {
   e.preventDefault()
@@ -76,12 +48,21 @@ navigate("/");
     }
     setIsLoading(true)
     try {
-      await signInWithRedirect(auth, provider);
-      // Browser navigates away to Google here; result is handled by
-      // getRedirectResult in the useEffect above once we return.
+      const response = await signInWithPopup(auth, provider)
+      const user = response.user
+      const name = user.displayName
+      const email = user.email
+
+      const result = await axios.post('/api/auth/googleLogin', {
+        name, email
+      })
+      toast.success("Google registration successful!")
+      setUserData(result.data.user)
+      navigate("/")
     } catch (error) {
       console.log(error);
       toast.error("Google registration failed")
+    } finally {
       setIsLoading(false)
     }
   }
