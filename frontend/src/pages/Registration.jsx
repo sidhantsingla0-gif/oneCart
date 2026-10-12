@@ -1,9 +1,8 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useState } from 'react'
 import google from '../assets/googleLogo.png'
 import { IoEyeOutline } from "react-icons/io5";
 import { IoEye } from "react-icons/io5";
 import { useNavigate } from 'react-router-dom'
-import { authDataContext } from '../context/AuthContext.jsx'
 import { userDataContext } from '../context/UserContext.jsx'
 import axios from "../config/axios"
 import { signInWithPopup } from 'firebase/auth';
@@ -15,7 +14,6 @@ function Registration() {
 let navigate = useNavigate()
 let [show, setShow] = useState(false)
 let [isLoading, setIsLoading] = useState(false)
-let {serverUrl} = useContext(authDataContext)
 let { getCurrentUser, setUserData } = useContext(userDataContext)
 
 let [name, setName] = useState("")
@@ -61,7 +59,9 @@ navigate("/");
       navigate("/")
     } catch (error) {
       console.log(error);
-      toast.error("Google registration failed")
+      if (error?.code !== 'auth/popup-closed-by-user') {
+        toast.error("Google registration failed")
+      }
     } finally {
       setIsLoading(false)
     }

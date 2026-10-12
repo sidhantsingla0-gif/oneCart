@@ -1,9 +1,8 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useState } from 'react'
 import google from '../assets/googleLogo.png'
 import { IoEyeOutline } from "react-icons/io5";
 import { IoEye } from "react-icons/io5";
 import { useNavigate } from 'react-router-dom'
-import { authDataContext } from '../context/AuthContext.jsx';
 import { userDataContext } from '../context/UserContext.jsx';
 import axios from "../config/axios"
 import { signInWithPopup } from 'firebase/auth';
@@ -16,8 +15,7 @@ function Login() {
   let [email,setEmail] = useState("")
   let [password,setPassword] = useState("")
   let [isLoading, setIsLoading] = useState(false)
-  let {serverUrl} = useContext(authDataContext)
-  let {getCurrentUser, setUserData} = useContext(userDataContext)
+  let {setUserData} = useContext(userDataContext)
 
 
 
@@ -56,15 +54,17 @@ function Login() {
         const name = user.displayName
         const email = user.email
 
-        const result = await axios.post(serverUrl + '/api/auth/googleLogin', {
+        const result = await axios.post('/api/auth/googleLogin', {
           name, email
-        }, { withCredentials: true })
+        })
         toast.success("Google login successful!")
         setUserData(result.data.user)
         navigate("/")
       } catch (error) {
         console.log(error);
-        toast.error("Google login failed")
+        if (error?.code !== 'auth/popup-closed-by-user') {
+          toast.error("Google login failed")
+        }
       } finally {
         setIsLoading(false)
       }

@@ -2,6 +2,8 @@
 // is blocked with "Error 403: disallowed_useragent". Google requires
 // sign-in to happen in a standard, full browser.
 export function isInAppBrowser() {
+  if (typeof window === "undefined" || !navigator) return false;
+
   const ua = navigator.userAgent || navigator.vendor || window.opera || "";
 
   const patterns = [
