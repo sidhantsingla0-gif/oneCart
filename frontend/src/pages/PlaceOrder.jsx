@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Tittle from "../component/Tittle";
 import CartTotal from "../component/cartTotal";
 import razorpay from "../assets/Razorpay.png"
 import { shopDataContext } from "../context/ShopContext.jsx";
-import { authDataContext } from "../context/AuthContext";
+import { userDataContext } from "../context/UserContext.jsx";
 import axios from "../config/axios"
 import { toast } from 'react-toastify';
 
@@ -13,7 +13,7 @@ function PlaceOrder() {
     let [isLoading, setIsLoading] = React.useState(false)
     let navigate = useNavigate()
     const { cartItems,setCartItems,getCartAmount, delivery_fee, products } = React.useContext(shopDataContext);
-    let {serverUrl} = React.useContext(authDataContext)
+    const { userData } = React.useContext(userDataContext);
     let [formData, setFormData] = React.useState({
         firstName: "",
         lastName: "",
@@ -25,6 +25,24 @@ function PlaceOrder() {
         country: "",
         phoneNumber: ""
     })
+
+    useEffect(() => {
+        if (!userData) {
+            navigate("/login");
+            return;
+        }
+
+        const nameParts = (userData.name || "").trim().split(" ");
+        const defaultFirstName = nameParts[0] || "";
+        const defaultLastName = nameParts.slice(1).join(" ") || "";
+
+        setFormData((prev) => ({
+            ...prev,
+            firstName: prev.firstName || defaultFirstName,
+            lastName: prev.lastName || defaultLastName,
+            email: userData.email || prev.email,
+        }));
+    }, [userData, navigate]);
 
     const onChangeHandler = (e) => {
         const name = e.target.name;
@@ -147,13 +165,17 @@ function PlaceOrder() {
             required onChange={onChangeHandler} name="lastName" value={formData.lastName}
           />
         </div>
-        <div className="w-[100%] h-[70px] flex items-center justify-between px-[10px]">
+        <div className="w-[100%] flex flex-col justify-center px-[10px] my-[5px]">
           <input
             type="email"
             placeholder="Email Address"
-            className="w-[100%] h-[50px] rounded-md bg-slate-700 placeholder:text-[white] text-[18px] px-[20px] shadow-sm shadow-[#343434]"
-            required onChange={onChangeHandler} name="email" value={formData.email}
+            className="w-[100%] h-[50px] rounded-md bg-slate-800 text-slate-300 cursor-not-allowed placeholder:text-slate-400 text-[18px] px-[20px] shadow-sm shadow-[#343434] border border-slate-600/40"
+            readOnly
+            title="Account email is locked to ensure order authenticity"
+            name="email"
+            value={formData.email}
           />
+          <span className="text-[12px] text-emerald-400 mt-1 pl-1">✓ Verified Account Email</span>
         </div>
         <div className="w-[100%] h-[70px] flex items-center justify-between px-[10px]">
           <input
