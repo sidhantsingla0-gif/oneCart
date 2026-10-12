@@ -45,8 +45,17 @@ function PlaceOrder() {
     }, [userData, navigate]);
 
     const onChangeHandler = (e) => {
-        const name = e.target.name;
-        const value = e.target.value;
+        const { name, value } = e.target;
+        if (name === "phoneNumber") {
+            const numericValue = value.replace(/\D/g, "").slice(0, 10);
+            setFormData(data => ({ ...data, phoneNumber: numericValue }));
+            return;
+        }
+        if (name === "pinCode") {
+            const numericValue = value.replace(/\D/g, "").slice(0, 6);
+            setFormData(data => ({ ...data, pinCode: numericValue }));
+            return;
+        }
         setFormData(data => ({ ...data, [name]: value }))
     }
 
@@ -87,8 +96,48 @@ function PlaceOrder() {
 
    const onSubmitHandler = async (e) => {
   e.preventDefault();
+
+  // 1. Validate First and Last Name
+  if (formData.firstName.trim().length < 2) {
+    toast.error("Please enter a valid first name (minimum 2 characters).");
+    return;
+  }
+  if (formData.lastName.trim().length < 1) {
+    toast.error("Please enter your last name.");
+    return;
+  }
+
+  // 2. Validate Street Address
+  if (formData.street.trim().length < 5) {
+    toast.error("Please enter a detailed street address (minimum 5 characters).");
+    return;
+  }
+
+  // 3. Validate City and State
+  if (formData.city.trim().length < 2) {
+    toast.error("Please enter a valid city name.");
+    return;
+  }
+  if (formData.state.trim().length < 2) {
+    toast.error("Please enter a valid state name.");
+    return;
+  }
+
+  // 4. Validate PIN Code (6 digits)
+  const pinRegex = /^[1-9]\d{5}$/;
+  if (!pinRegex.test(formData.pinCode.trim())) {
+    toast.error("Please enter a valid 6-digit PIN code.");
+    return;
+  }
+
+  // 5. Validate Phone Number (10 digits starting with 6-9)
+  const phoneRegex = /^[6-9]\d{9}$/;
+  if (!phoneRegex.test(formData.phoneNumber.trim())) {
+    toast.error("Please enter a valid 10-digit mobile number starting with 6-9.");
+    return;
+  }
+
   setIsLoading(true)
-  console.log(formData);
   try {
     let orderItems = [];
 
@@ -107,6 +156,13 @@ function PlaceOrder() {
         }
       }
     }
+
+    if (orderItems.length === 0) {
+      toast.error("Your cart is empty. Please add items before placing an order.");
+      setIsLoading(false);
+      return;
+    }
+
     let orderData = {
         address : formData,
         items : orderItems,
@@ -157,12 +213,14 @@ function PlaceOrder() {
             placeholder="First name"
             className="w-[48%] h-[50px] rounded-md bg-slate-700 placeholder:text-[white] text-[18px] px-[20px] shadow-sm shadow-[#343434]"
             required onChange={onChangeHandler} name="firstName" value={formData.firstName}
+            minLength={2}
           />
           <input
             type="text"
             placeholder="Last name"
             className="w-[48%] h-[50px] rounded-md bg-slate-700 shadow-sm shadow-[#343434] placeholder:text-[white] text-[18px] px-[20px]"
             required onChange={onChangeHandler} name="lastName" value={formData.lastName}
+            minLength={1}
           />
         </div>
         <div className="w-[100%] flex flex-col justify-center px-[10px] my-[5px]">
@@ -180,9 +238,10 @@ function PlaceOrder() {
         <div className="w-[100%] h-[70px] flex items-center justify-between px-[10px]">
           <input
             type="text"
-            placeholder="Street"
+            placeholder="House / Flat No., Street, Landmark"
             className="w-[100%] h-[50px] rounded-md bg-slate-700 placeholder:text-[white] text-[18px] px-[20px] shadow-sm shadow-[#343434]"
             required onChange={onChangeHandler} name="street" value={formData.street}
+            minLength={5}
           />
         </div>
         <div className="w-[100%] h-[70px] flex items-center justify-between px-[10px]">
@@ -191,18 +250,22 @@ function PlaceOrder() {
             placeholder="City"
             className="w-[48%] h-[50px] rounded-md bg-slate-700 placeholder:text-[white] text-[18px] px-[20px] shadow-sm shadow-[#343434]"
             required onChange={onChangeHandler} name="city" value={formData.city}
+            minLength={2}
           />
           <input
             type="text"
             placeholder="State"
             className="w-[48%] h-[50px] rounded-md bg-slate-700 shadow-sm shadow-[#343434] placeholder:text-[white] text-[18px] px-[20px]"
             required onChange={onChangeHandler} name="state" value={formData.state}
+            minLength={2}
           />
         </div>
         <div className="w-[100%] h-[70px] flex items-center justify-between px-[10px]">
           <input
             type="text"
-            placeholder="PinCode"
+            inputMode="numeric"
+            maxLength={6}
+            placeholder="6-digit PIN Code"
             className="w-[48%] h-[50px] rounded-md bg-slate-700 placeholder:text-[white] text-[18px] px-[20px] shadow-sm shadow-[#343434]"
             required onChange={onChangeHandler} name="pinCode" value={formData.pinCode}
           />
@@ -213,13 +276,20 @@ function PlaceOrder() {
             required onChange={onChangeHandler} name="country" value={formData.country}
           />
         </div>
-        <div className="w-[100%] h-[70px] flex items-center justify-between px-[10px]">
+        <div className="w-[100%] flex flex-col justify-center px-[10px] my-[5px]">
           <input
-            type="text"
-            placeholder="Phone Number"
+            type="tel"
+            inputMode="numeric"
+            maxLength={10}
+            placeholder="10-digit Mobile Number"
             className="w-[100%] h-[50px] rounded-md bg-slate-700 placeholder:text-[white] text-[18px] px-[20px] shadow-sm shadow-[#343434]"
             required onChange={onChangeHandler} name="phoneNumber" value={formData.phoneNumber}
           />
+          {formData.phoneNumber && formData.phoneNumber.length > 0 && formData.phoneNumber.length < 10 && (
+            <span className="text-[12px] text-amber-400 mt-1 pl-1">
+              Must be exactly 10 digits ({10 - formData.phoneNumber.length} digits left)
+            </span>
+          )}
         </div>
        <div className="w-full flex justify-center mt-[20px]">
   <button 
