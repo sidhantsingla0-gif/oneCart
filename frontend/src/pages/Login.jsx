@@ -9,16 +9,15 @@ import { signInWithPopup } from 'firebase/auth';
 import { auth, provider } from '../../utils/Firebase.js';
 import { isInAppBrowser } from '../../utils/isWebView.js';
 import { toast } from 'react-toastify';
-import OtpModal from '../component/OtpModal.jsx';
 function Login() {
 
   let [show, setShow] = useState(false)
   let [email,setEmail] = useState("")
   let [password,setPassword] = useState("")
   let [isLoading, setIsLoading] = useState(false)
-  let [showOtpModal, setShowOtpModal] = useState(false)
-  let [isVerifyingOtp, setIsVerifyingOtp] = useState(false)
   let {setUserData} = useContext(userDataContext)
+
+
 
   let navigate = useNavigate()
 
@@ -27,51 +26,19 @@ function Login() {
     setIsLoading(true)
     try {
       let result = await axios.post('/api/auth/login', {
-        email, password
+        email,password
       })
-      if (result.data?.requireOtp) {
-        toast.info("Verification code sent to your email!")
-        setShowOtpModal(true)
-      } else {
-        toast.success("Login successful!")
-        setUserData(result.data.user)
-        navigate("/")
-      }
+      console.log(result.data);
+      toast.success("Login successful!")
+      setUserData(result.data.user)
+      navigate("/");
+
+
     } catch (error) {
       console.log(error);
       toast.error(error.response?.data?.message || "Login failed")
     } finally {
       setIsLoading(false)
-    }
-  }
-
-  const handleVerifyOtp = async (otp) => {
-    setIsVerifyingOtp(true)
-    try {
-      let result = await axios.post('/api/auth/verify-login-otp', {
-        email, otp
-      })
-      toast.success("Login successful!")
-      setUserData(result.data.user)
-      setShowOtpModal(false)
-      navigate("/")
-    } catch (error) {
-      console.log(error)
-      toast.error(error.response?.data?.message || "Invalid verification code")
-    } finally {
-      setIsVerifyingOtp(false)
-    }
-  }
-
-  const handleResendOtp = async () => {
-    try {
-      await axios.post('/api/auth/resend-otp', {
-        email, purpose: "login"
-      })
-      toast.success("A new verification code has been sent!")
-    } catch (error) {
-      console.log(error)
-      toast.error(error.response?.data?.message || "Failed to resend code")
     }
   }
 
@@ -146,16 +113,6 @@ function Login() {
         </div>
       </form>
     </div>
-
-    <OtpModal
-      isOpen={showOtpModal}
-      onClose={() => setShowOtpModal(false)}
-      email={email}
-      onVerify={handleVerifyOtp}
-      onResend={handleResendOtp}
-      isLoading={isVerifyingOtp}
-      title="2-Step Verification"
-    />
     </div>
   )
 

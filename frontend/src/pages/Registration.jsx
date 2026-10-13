@@ -9,14 +9,11 @@ import { signInWithPopup } from 'firebase/auth';
 import { auth, provider } from '../../utils/Firebase.js';
 import { isInAppBrowser } from '../../utils/isWebView.js';
 import { toast } from 'react-toastify';
-import OtpModal from '../component/OtpModal.jsx';
 function Registration() {
 
 let navigate = useNavigate()
 let [show, setShow] = useState(false)
 let [isLoading, setIsLoading] = useState(false)
-let [showOtpModal, setShowOtpModal] = useState(false)
-let [isVerifyingOtp, setIsVerifyingOtp] = useState(false)
 let { getCurrentUser, setUserData } = useContext(userDataContext)
 
 let [name, setName] = useState("")
@@ -27,52 +24,18 @@ const handleSignUp = async (e) => {
   e.preventDefault()
   setIsLoading(true)
   try {
-    const result = await axios.post('/api/auth/send-registration-otp', {
-      name, email, password
+    const result = await axios.post('/api/auth/registration', {
+  name,email,password
     })
-    if (result.data?.requireOtp) {
-      toast.info("Verification code sent to your email!")
-      setShowOtpModal(true)
-    } else {
-      toast.success("Registration successful!")
-      await getCurrentUser();
-      navigate("/");
-    }
+    console.log(result.data);
+    toast.success("Registration successful!")
+    await getCurrentUser();   // ✅ ensures auth sync
+navigate("/");
   } catch (error) {
-    console.log(error.response?.data || error.message);
-    toast.error(error.response?.data?.message || "Registration failed")
+  console.log(error.response?.data || error.message);
+  toast.error(error.response?.data?.message || "Registration failed")
   } finally {
     setIsLoading(false)
-  }
-}
-
-const handleVerifyOtp = async (otp) => {
-  setIsVerifyingOtp(true)
-  try {
-    const result = await axios.post('/api/auth/verify-registration-otp', {
-      name, email, password, otp
-    })
-    toast.success("Registration successful!")
-    setUserData(result.data.user)
-    setShowOtpModal(false)
-    navigate("/")
-  } catch (error) {
-    console.log(error)
-    toast.error(error.response?.data?.message || "Invalid verification code")
-  } finally {
-    setIsVerifyingOtp(false)
-  }
-}
-
-const handleResendOtp = async () => {
-  try {
-    await axios.post('/api/auth/resend-otp', {
-      email, purpose: "registration"
-    })
-    toast.success("A new verification code has been sent!")
-  } catch (error) {
-    console.log(error)
-    toast.error(error.response?.data?.message || "Failed to resend code")
   }
 }
 
@@ -148,16 +111,6 @@ const handleResendOtp = async () => {
         </div>
       </form>
     </div>
-
-    <OtpModal
-      isOpen={showOtpModal}
-      onClose={() => setShowOtpModal(false)}
-      email={email}
-      onVerify={handleVerifyOtp}
-      onResend={handleResendOtp}
-      isLoading={isVerifyingOtp}
-      title="Verify Your Email"
-    />
     </div>
   )
 }
