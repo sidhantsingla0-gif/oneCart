@@ -177,7 +177,7 @@ oneCart/
 
 ### 1.Clone the repository
 
-git clone https://github.com/your-username/oneCart.git
+git clone https://github.com/sidhantsingla0-gif/oneCart
 
 cd oneCart
 
